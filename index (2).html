@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudyMind AI — Smart Study Planner</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Top Nav -->
+  <nav class="topnav">
+    <div class="nav-brand">
+      <div class="brand-icon"><i class="fas fa-brain"></i></div>
+      <span class="brand-name">StudyMind<span class="brand-ai">AI</span></span>
+    </div>
+    <div class="nav-actions">
+      <button class="btn-ghost" id="themeToggle" title="Toggle theme">
+        <i class="fas fa-moon" id="themeIcon"></i>
+      </button>
+      <button class="btn-ghost" id="resetBtn" title="Reset all data">
+        <i class="fas fa-rotate-left"></i>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ONBOARDING SCREEN -->
+  <section id="onboarding" class="screen active">
+    <div class="onboarding-hero">
+      <div class="hero-badge"><i class="fas fa-sparkles"></i> AI-Powered Planning</div>
+      <h1 class="hero-title">Study smarter,<br /><span class="gradient-text">not harder.</span></h1>
+      <p class="hero-sub">Tell us about your semester and we'll build a personalized study plan that adapts to your life.</p>
+      <button class="btn-primary btn-lg" id="startSetup">
+        Get Started <i class="fas fa-arrow-right"></i>
+      </button>
+    </div>
+    <div class="hero-visual">
+      <div class="floating-card card-1"><i class="fas fa-check-circle"></i> Task complete</div>
+      <div class="floating-card card-2"><i class="fas fa-fire"></i> 7-day streak!</div>
+      <div class="floating-card card-3"><i class="fas fa-chart-line"></i> 84% on track</div>
+    </div>
+  </section>
+
+  <!-- SETUP WIZARD -->
+  <section id="setup" class="screen">
+    <div class="setup-container">
+      <div class="setup-header">
+        <button class="btn-ghost back-btn" id="backToOnboard"><i class="fas fa-arrow-left"></i></button>
+        <div class="step-indicator">
+          <div class="step active" data-step="1">1</div>
+          <div class="step-line"></div>
+          <div class="step" data-step="2">2</div>
+          <div class="step-line"></div>
+          <div class="step" data-step="3">3</div>
+        </div>
+      </div>
+
+      <!-- Step 1: Subjects -->
+      <div class="setup-step active" id="step1">
+        <div class="step-icon"><i class="fas fa-book-open"></i></div>
+        <h2>Your Subjects</h2>
+        <p class="step-desc">Add the subjects you're studying this semester</p>
+        <div id="subjectList" class="subject-list"></div>
+        <button class="btn-add" id="addSubject"><i class="fas fa-plus"></i> Add Subject</button>
+        <div class="step-actions">
+          <button class="btn-primary" id="toStep2">Continue <i class="fas fa-arrow-right"></i></button>
+        </div>
+      </div>
+
+      <!-- Step 2: Schedule -->
+      <div class="setup-step" id="step2">
+        <div class="step-icon"><i class="fas fa-calendar-alt"></i></div>
+        <h2>Your Schedule</h2>
+        <p class="step-desc">When do your exams happen and how much time do you have?</p>
+        <div class="form-grid">
+          <div class="form-group">
+            <label><i class="fas fa-clock"></i> Daily Study Hours</label>
+            <div class="range-wrap">
+              <input type="range" id="studyHours" min="1" max="12" value="4" />
+              <span class="range-val" id="studyHoursVal">4 hrs</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label><i class="fas fa-calendar-check"></i> Exam Season Starts</label>
+            <input type="date" id="examStart" class="input-field" />
+          </div>
+          <div class="form-group">
+            <label><i class="fas fa-user-graduate"></i> Attendance %</label>
+            <div class="range-wrap">
+              <input type="range" id="attendance" min="0" max="100" value="75" />
+              <span class="range-val" id="attendanceVal">75%</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label><i class="fas fa-code"></i> Coding Goal (problems/week)</label>
+            <input type="number" id="codingGoal" class="input-field" min="0" max="50" value="5" placeholder="e.g. 5" />
+          </div>
+        </div>
+        <div class="step-actions">
+          <button class="btn-ghost" id="backToStep1"><i class="fas fa-arrow-left"></i> Back</button>
+          <button class="btn-primary" id="toStep3">Continue <i class="fas fa-arrow-right"></i></button>
+        </div>
+      </div>
+
+      <!-- Step 3: Confirm -->
+      <div class="setup-step" id="step3">
+        <div class="step-icon"><i class="fas fa-rocket"></i></div>
+        <h2>Ready to launch!</h2>
+        <p class="step-desc">Here's a summary of your plan</p>
+        <div id="summaryCard" class="summary-card"></div>
+        <div class="step-actions">
+          <button class="btn-ghost" id="backToStep2"><i class="fas fa-arrow-left"></i> Back</button>
+          <button class="btn-primary btn-lg" id="generatePlan">
+            <i class="fas fa-brain"></i> Generate My Plan
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAIN DASHBOARD -->
+  <section id="dashboard" class="screen">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div class="brand-icon sm"><i class="fas fa-brain"></i></div>
+        <span>StudyMind</span>
+      </div>
+      <nav class="sidebar-nav">
+        <button class="nav-item active" data-tab="schedule"><i class="fas fa-calendar-days"></i><span>Schedule</span></button>
+        <button class="nav-item" data-tab="progress"><i class="fas fa-chart-pie"></i><span>Progress</span></button>
+        <button class="nav-item" data-tab="insights"><i class="fas fa-lightbulb"></i><span>Insights</span></button>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="streak-badge">
+          <i class="fas fa-fire"></i>
+          <span id="sidebarStreak">0</span> day streak
+        </div>
+        <button class="btn-ghost sm" id="sidebarReset"><i class="fas fa-gear"></i></button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Header Bar -->
+      <div class="content-header">
+        <div>
+          <h1 class="page-title" id="pageTitle">My Schedule</h1>
+          <p class="page-sub" id="pageSub">Here's your AI-generated study plan</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn-warning" id="missedDayBtn">
+            <i class="fas fa-triangle-exclamation"></i> Missed a Day
+          </button>
+          <button class="btn-secondary" id="regenerateBtn">
+            <i class="fas fa-rotate"></i> Regenerate
+          </button>
+          <button class="btn-ghost" id="mobThemeToggle" title="Toggle theme">
+            <i class="fas fa-moon" id="mobThemeIcon"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Alert banner -->
+      <div id="alertBanner" class="alert-banner hidden">
+        <i class="fas fa-triangle-exclamation"></i>
+        <span id="alertText"></span>
+        <button id="closeAlert"><i class="fas fa-xmark"></i></button>
+      </div>
+
+      <!-- ===== SCHEDULE TAB ===== -->
+      <div class="tab-panel active" id="tab-schedule">
+        <!-- Stats row -->
+        <div class="stats-row" id="statsRow"></div>
+
+        <!-- Placement reminder -->
+        <div class="placement-banner">
+          <div class="placement-icon"><i class="fas fa-briefcase"></i></div>
+          <div>
+            <strong>Placement Prep Reminder</strong>
+            <p>Balance your DSA practice with academics. Aim for <span id="codingGoalDisplay">5</span> problems/week alongside your syllabus. Companies look for both!</p>
+          </div>
+          <div class="lms-badge"><i class="fas fa-graduation-cap"></i> Sync with LMS →</div>
+        </div>
+
+        <!-- Day navigator -->
+        <div class="day-nav">
+          <button class="btn-ghost" id="prevDay"><i class="fas fa-chevron-left"></i></button>
+          <div class="day-label-wrap">
+            <span class="day-label" id="dayLabel">Today</span>
+            <span class="day-date" id="dayDate"></span>
+          </div>
+          <button class="btn-ghost" id="nextDay"><i class="fas fa-chevron-right"></i></button>
+        </div>
+
+        <!-- Task list -->
+        <div id="taskList" class="task-list"></div>
+
+        <!-- Upcoming exams -->
+        <div class="section-title"><i class="fas fa-calendar-xmark"></i> Upcoming Exams</div>
+        <div id="examTimeline" class="exam-timeline"></div>
+      </div>
+
+      <!-- ===== PROGRESS TAB ===== -->
+      <div class="tab-panel" id="tab-progress">
+        <div class="charts-grid">
+          <div class="chart-card">
+            <div class="chart-label">Task Completion</div>
+            <div class="chart-wrap">
+              <canvas id="completionChart"></canvas>
+            </div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-label">Weekly Study Distribution</div>
+            <div class="chart-wrap">
+              <canvas id="weeklyChart"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="section-title"><i class="fas fa-list-check"></i> All Tasks</div>
+        <div id="allTasksList" class="task-list"></div>
+      </div>
+
+      <!-- ===== INSIGHTS TAB ===== -->
+      <div class="tab-panel" id="tab-insights">
+        <div class="insights-grid" id="insightsGrid"></div>
+        <div class="section-title"><i class="fas fa-code"></i> Coding Practice Tracker</div>
+        <div class="coding-tracker" id="codingTracker"></div>
+        <div class="lms-promo">
+          <i class="fas fa-plug"></i>
+          <div>
+            <strong>Connect your LMS</strong>
+            <p>Integrate with Moodle, Canvas, or Blackboard to auto-import deadlines and sync attendance data.</p>
+          </div>
+          <button class="btn-secondary">Connect <i class="fas fa-arrow-right"></i></button>
+        </div>
+      </div>
+    </main>
+  </section>
+
+  <!-- MISSED DAY MODAL -->
+  <div id="missedModal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-icon warn"><i class="fas fa-calendar-xmark"></i></div>
+      <h3>Missed a Study Day?</h3>
+      <p>No worries! StudyMind AI will redistribute today's tasks across the next 3 days to keep you on track.</p>
+      <div class="modal-actions">
+        <button class="btn-ghost" id="cancelMissed">Cancel</button>
+        <button class="btn-warning" id="confirmMissed">Adjust My Plan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESET MODAL -->
+  <div id="resetModal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-icon danger"><i class="fas fa-rotate-left"></i></div>
+      <h3>Reset Everything?</h3>
+      <p>This will clear all your subjects, schedules, and progress. You'll start fresh.</p>
+      <div class="modal-actions">
+        <button class="btn-ghost" id="cancelReset">Cancel</button>
+        <button class="btn-danger" id="confirmReset">Yes, Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
